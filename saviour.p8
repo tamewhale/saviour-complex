@@ -422,11 +422,6 @@ function collide(a1, a2)
 end
 
 function collisions()
-    --[[
-    for a1 in all(actor) do
-        collide(player, a1)
-    end
-    ]]--
     for a1 in all(actor) do
         for a2 in all(actor) do
             collide(a1, a2)
