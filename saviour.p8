@@ -165,6 +165,7 @@ function move_pickup(a)
 end
 
 function room_transition()
+    -- increment room number and move camera
     if (room >= 2) then
         room = 0
         camera_x = 0
@@ -176,7 +177,7 @@ function room_transition()
     -- reset gravity
     gravity_direction = 1
     -- move player x and y to the position of the player map tile
-        for y = 0, 15 do 
+    for y = 0, 15 do 
         for x = 0 + room * 16, 0 + room * 16 + 15 do
             if (mget(x, y) == 48) then
                 player.x = x
@@ -185,6 +186,13 @@ function room_transition()
             end
         end 
     end
+    -- destroy all actors except player
+    for a in all(actor) do
+        if (a.kind != 1) then
+            del(actor, a)
+        end
+    end
+    -- todo: reset room
 end
 
 function move_player(pl)
@@ -228,12 +236,7 @@ function move_player(pl)
         pl.f0 = 0
     else
         pl.frame = 49 + flr(pl.f0)
-    end
-
-    if (pl == player2) then
-        pl.frame = pl.frame + 75 - 48
-    end
-    
+    end    
 end
 
 function move_monster(m)
