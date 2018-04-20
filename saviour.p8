@@ -175,7 +175,10 @@ function room_transition()
         camera_x += 16 * 8
     end
     -- reset gravity
-    gravity_direction = 1
+    if (gravity_direction < 0) then
+        reverse_gravity()
+        -- todo: flip switches
+    end
     -- move player x and y to the position of the player map tile
     for y = 0, 15 do 
         for x = 0 + room * 16, 0 + room * 16 + 15 do
@@ -248,15 +251,6 @@ function move_monster(m)
     end
 end
 
-function freeze_prisoner(a)
-    if (a.kind == 3) then
-        a.d = 0
-        -- todo: freeze on correct frame
-        a.frame = 1
-        a.f0 = 1
-    end
-end
-
 function move_actor(pl)
     -- to do: replace with callbacks
     if (pl.kind == 1) then
@@ -288,11 +282,19 @@ function move_actor(pl)
 
         -- destroy lock if player touches it holding key
         if (mget(x1, pl.y - 0.5, 0) == 46 and pl.haskey) then
-            clear_cel(x1, pl.y - 0.5)
+            clear_cel(x1, pl.y - 0.5) -- remove lock
             make_debris(pl, x1)
             sfx(10)
-            pl.haskey = false
-            foreach (actor, freeze_prisoner)
+            pl.haskey = false -- remove key
+            -- make prisoner stand still
+            for a in all(actor) do
+                if (a.kind == 3) then
+                    a.d = 0
+                    a.dx = 0
+                    a.frame = 2
+                    a.f0 = 1
+                end
+            end
         end
         
         -- bounce 
@@ -401,8 +403,7 @@ function collide_event(a1, a2)
             
             -- switch
             if (a2.frame == 70 or a2.frame == 72) then
-                gravity_direction *= -1
-                foreach (actor, change_gravity)
+                reverse_gravity()
                 reverse_switches(a2.frame)
                 -- change switch sprite
                 a2.frame += 1
@@ -424,8 +425,11 @@ function collide_event(a1, a2)
     end  
 end
 
-function change_gravity(actor)
-    actor.ddy *= -1
+function reverse_gravity()
+    gravity_direction *= -1
+    for a in all(actor) do
+        a.ddy *= -1
+    end
 end
 
 function reverse_switches(activated_switch)
