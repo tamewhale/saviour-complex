@@ -97,12 +97,13 @@ function clear_cel(x, y)
     end
 end
 
-function move_spawns(x0, y0)
+function move_spawns()
 
-    -- spawn stuff close to x0, y0
-
-    for y=0, 32 do
-        for x = x0 - 10, x0 + 10 do
+    -- spawn anything in current room
+    y0 = camera_y / 8
+    x0 = camera_x / 8
+    for y = y0, y0 + 15 do
+        for x = x0, x0 + 15 do
             val = mget(x, y)
             m = nil
 
@@ -116,7 +117,7 @@ function move_spawns(x0, y0)
                 end
             end
 
-            -- monster
+            -- prisoner
             if (fget(val, 3)) then
                 m = make_actor(3, x + 0.5, y + 1, -1)
                 m.f0 = val
