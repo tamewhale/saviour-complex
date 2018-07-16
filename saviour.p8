@@ -418,6 +418,10 @@ function collide_event(a1, a2)
             end
         elseif (a2.kind == 3) then -- prisoner
             level_complete = true
+            a1.frame = 48
+            a1.d = 1
+            a2.frame = 113
+            a2.d = -1
         end
     end
 
@@ -568,9 +572,9 @@ function draw_actor(pl)
         1, 
         1, 
         pl.d < 0,
-        gravity_direction < 0 and pl.kind != 2
-        -- last line flips everything except pickups vertically
-        -- if gravity is reversed
+        gravity_direction < 0 and pl.ddy != 0
+        -- last line flips everything except things 
+        -- not affected by gravity if gravity is reversed
     )
     -- draw key on top of actor
     if (pl.haskey) then
