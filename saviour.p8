@@ -418,6 +418,7 @@ function collide_event(a1, a2)
             end
         elseif (a2.kind == 3) then -- prisoner
             level_complete = true
+            level_complete_animating = true
             a1.frame = 48
             a1.d = 1
             a2.frame = 113
@@ -509,14 +510,22 @@ function outgame_logic()
 end
 
 function _update()
-    if (not level_complete) then
+    if (level_complete) then
+        update_level_complete()
+    else
         foreach(actor, move_actor)
         foreach(sparkle, move_sparkle)
         collisions()
         move_spawns(player.x, player.y)
         outgame_logic()
         t = t + 1
-    else
+    end
+end
+
+function update_level_complete()
+    if (level_complete_animating) then
+        player_stopped = player_stopped or false
+        prisoner_stopped = prisoner_stopped or false
         -- move prisoner and player to centre of screen
         for a in all(actor) do
             finalx = 48
@@ -529,7 +538,17 @@ function _update()
                 a.dy = (finaly - a.y * 8) / abs((finalx - a.x * 8))
                 a.x += a.dx * 0.1
                 a.y += a.dy * 0.1
+            else
+                if (a.kind == 1) then
+                    player_stopped = true
+                else
+                    prisoner_stopped = true
+                end
             end
+        end
+        if (player_stopped and prisoner_stopped) then
+            -- todo: set these two vars to false when we start a new level
+            level_complete_animating = false
         end
     end
 end
@@ -599,11 +618,11 @@ function _draw()
     pal(12, 0)
     if (not level_complete) then
         mapdraw(0, 0, 0, 0, 128, 64, 1)
-    else
+    elseif (level_complete_animating == false) then
         cursor(camera_x + 36, camera_y + 32)
         print("thanks i guess")
         cursor(camera_x + 28, camera_y + 64)
-        print("press x to continue")
+        print("press ❎ to continue")
     end
     pal()
     if (not level_complete) then
