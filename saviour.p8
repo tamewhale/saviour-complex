@@ -69,6 +69,11 @@ function _init()
     camera_y = 0
     gravity_direction = 1
     level_complete = false
+    level_complete_message = {
+        "thanks i guess",
+        "did you see that?\n i rescued myself",
+        "what do you want?\n a medal?"
+    }
     
     -- spawn player
     for y = 0, 15 do 
@@ -629,7 +634,7 @@ function _draw()
         mapdraw(0, 0, 0, 0, 128, 64, 1)
     elseif (level_complete_animating == false) then
         cursor(camera_x + 36, camera_y + 32)
-        print("thanks i guess")
+        print(level_complete_message[room + 1])
         cursor(camera_x + 28, camera_y + 64)
         print("press ❎ to continue")
     end
