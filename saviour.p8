@@ -167,6 +167,7 @@ function move_pickup(a)
 end
 
 function room_transition()
+    level_complete = false
     -- increment room number and move camera
     if (room >= 3) then
         room = 0
@@ -188,6 +189,8 @@ function room_transition()
                 player.x = x
                 player.y = y + 1
                 player.d = 1
+                player.dx = 0
+                player.dy = 0
             end
         end 
     end
@@ -224,7 +227,7 @@ function move_player(pl)
         pl.dy = -0.7 * gravity_direction
         sfx(8)
     end
-    
+    -- todo: remove this
     if (btnp(5, b)) then
         room_transition()
     end
@@ -550,6 +553,8 @@ function update_level_complete()
             -- todo: set these two vars to false when we start a new level
             level_complete_animating = false
         end
+    elseif (btn(5)) then
+        room_transition()        
     end
 end
 
