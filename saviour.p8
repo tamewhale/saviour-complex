@@ -177,11 +177,6 @@ function room_transition()
         -- move camera to next room
         camera_x += 16 * 8
     end
-    -- reset gravity
-    if (gravity_direction < 0) then
-        reverse_gravity()
-        -- todo: flip switches
-    end
     -- move player x and y to the position of the player map tile
     for y = 0, 15 do 
         for x = 0 + room * 16, 0 + room * 16 + 15 do
@@ -420,12 +415,7 @@ function collide_event(a1, a2)
                 del(actor, a2)
             end
         elseif (a2.kind == 3) then -- prisoner
-            level_complete = true
-            level_complete_animating = true
-            a1.frame = 48
-            a1.d = 1
-            a2.frame = 113
-            a2.d = -1
+            end_level(a1, a2)
         end
     end
 
@@ -525,18 +515,32 @@ function _update()
     end
 end
 
+function end_level(player, prisoner)
+    level_complete = true
+    level_complete_animating = true
+    player_stopped = false
+    prisoner_stopped = false
+    player.frame = 48
+    player.d = 1
+    prisoner.frame = 113
+    prisoner.d = -1
+    -- reset gravity
+    if (gravity_direction < 0) then
+        reverse_gravity()
+        -- todo: flip switches
+    end
+end
+
 function update_level_complete()
     if (level_complete_animating) then
-        player_stopped = player_stopped or false
-        prisoner_stopped = prisoner_stopped or false
         -- move prisoner and player to centre of screen
         for a in all(actor) do
-            finalx = 48
-            finaly = 56
+            finalx = camera_x + 48
+            finaly = camera_y + 56
             if (a.kind == 3) then
-                finalx = 80
+                finalx += 32
             end
-            if (flr(a.x * 8) != finalx) then
+            if (flr(a.x * 8) != finalx and flr(a.y * 8) != finaly) then
                 a.dx = (finalx - a.x * 8) / abs((finaly - a.y * 8))
                 a.dy = (finaly - a.y * 8) / abs((finalx - a.x * 8))
                 a.x += a.dx * 0.1
@@ -544,7 +548,7 @@ function update_level_complete()
             else
                 if (a.kind == 1) then
                     player_stopped = true
-                else
+                elseif (a.kind == 3) then
                     prisoner_stopped = true
                 end
             end
